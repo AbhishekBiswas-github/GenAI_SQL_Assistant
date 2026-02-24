@@ -1,5 +1,27 @@
 import streamlit as st
+from langchain_core.messages import HumanMessage, SystemMessage
+import json
 
 
 def get_query():
-    st.subheader("Business Query", divider="rainbow")
+    st.session_state.business_query = st.text_input("Enter the Business Query", value="Show sales of the last quarter region wise", placeholder="Business Query")
+    if st.button("Show Intent", type='primary'):
+        prompt = f"""
+        Extract the business intent, metrics and filter from the below user quesion:
+
+        Question:
+        {st.session_state.business_query}
+
+        return in below JSON format
+        {{
+            "business_intent": "...."
+            "metrics": [.....]
+            "filters": "...."
+        }}
+        """
+        chat_message = st.session_state.chat_model.invoke([
+            SystemMessage(content="You are a business analytics expert"),
+            HumanMessage(content=prompt)
+        ])
+        response_json = json.loads(chat_message.content)
+        st.session_state.intent = response_json
