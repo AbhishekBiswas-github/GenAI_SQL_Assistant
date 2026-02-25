@@ -1,7 +1,6 @@
 import streamlit as st
 from langchain_core.messages import HumanMessage, SystemMessage
 
-
 if 'table_name' not in st.session_state:
     st.session_state.table_name = False
 
@@ -11,6 +10,7 @@ if 'column_details' not in st.session_state:
 def get_schema():
     get_table_name()
     get_column_names()
+    get_optimization_info()
     validate_btn = st.button("Validate the schema", type='primary')
     if validate_btn:
         validate_status = validate_col_details()
@@ -25,23 +25,17 @@ def get_schema():
 
 
 def get_table_name():
-    st.session_state.table_name = st.text_input("Enter the table name: ", placeholder="Enter the table name", value="Sales")
+    st.session_state.table_name = st.text_input("Enter the table name: ", placeholder="Enter the table name", value=None)
 
 def get_column_names():
-    st.session_state.column_details = st.text_area("Enter the Column Names: ", placeholder="""
-    Enter as below format:
-    1. order_id (int)
-    2. order_date (date)
-    3. region (string)
-    4. revenue (float)
-    .
-    .     
-""", value="""1. order_id (int)
+    st.session_state.column_details = st.text_area("Enter the Column Names: ", placeholder="""Enter as below format:
+1. order_id (int)
 2. order_date (date)
 3. region (string)
-4. revenue (float)""", height=250)
+4. revenue (float)""", value=None, height=250)
 
-
+def get_optimization_info():
+    st.session_state.optimize = st.text_input("Optimization Instruction", placeholder="Optimization Instruction", value=None)
 
 def validate_col_details():
    
