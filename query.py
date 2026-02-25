@@ -25,3 +25,4 @@ def get_query():
         ])
         response_json = json.loads(chat_message.content)
         st.session_state.intent = response_json
+        st.toast("✅ Intent Generated Successfully.")
