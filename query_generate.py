@@ -1,8 +1,7 @@
 import streamlit as st
 from langchain_core.messages import HumanMessage, SystemMessage
 import json
-from streamlit_js_eval import streamlit_js_eval
-import time
+import sqlparse
 
 def generate_query():
     st.write("")
@@ -19,6 +18,9 @@ def generate_query():
     
     Filters: 
     {st.session_state.intent['filters']}
+
+    Optimization Instruction:
+    {st.session_state.optimize}
 
     Rules:
     - Use SELECT only
@@ -41,27 +43,41 @@ Generate an optimised SQL query.
 
 """
 
-    with st.spinner("Generating Query...."):
-        query_generated = st.session_state.chat_model.invoke([
-            SystemMessage(content=systemPrompt),
-            HumanMessage(content=prompt)
-        ])
+    if not st.session_state.generate_status:
+        with st.spinner("Generating Query...."):
+            query_generated = st.session_state.chat_model.invoke([
+                SystemMessage(content=systemPrompt),
+                HumanMessage(content=prompt)
+            ])
 
-        response = json.loads(query_generated.content)
-        st.code(response["code"], language="SQL")
-        st.subheader("Explanation")
-        st.info(f"""{response['explanation']}""")
-        st.toast("✅ SQL Query Generated Successfully.")
+            # st.write(query_generated)
+            response = json.loads(query_generated.content)
+            formatted_query = sqlparse.format(
+                response["code"],
+                reindent=True,
+                keyword_case="upper"
+            )
+            st.code(formatted_query, language="SQL")
+            st.subheader("Explanation")
+            st.info(f"""{response['explanation']}""")
+            st.toast("✅ SQL Query Generated Successfully.")
+            st.session_state.generate_status = True
 
+    keys_to_clear = [
+        "schema_status",
+        "schema_validated",
+        "query_status",
+        "intent",
+        "table_name",
+        "column_details",
+        "generate_status"
+    ]
 
+    if st.button("Reset Everything....", type='secondary'):
+        for key in keys_to_clear:
+            del st.session_state[key]
 
-    if st.button("Reset Everything....", type="secondary", key="reset_btn"):
-        st.session_state["do_reload"] = True
-
-    # Execute JS reload only ONCE
-    if st.session_state.get("do_reload", False):
-        streamlit_js_eval(js_expressions="parent.window.location.reload()")
-        st.session_state["do_reload"] = False
+        st.rerun()
 
 
 
