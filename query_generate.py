@@ -57,8 +57,9 @@ Generate an optimised SQL query.
                 reindent=True,
                 keyword_case="upper"
             )
+            st.subheader("Generated SQL Statement")
             st.code(formatted_query, language="SQL")
-            st.subheader("Explanation")
+            st.subheader("Query Explanation")
             st.info(f"""{response['explanation']}""")
             st.toast("✅ SQL Query Generated Successfully.")
             st.session_state.generate_status = True
@@ -78,7 +79,3 @@ Generate an optimised SQL query.
             del st.session_state[key]
 
         st.rerun()
-
-
-
-    
