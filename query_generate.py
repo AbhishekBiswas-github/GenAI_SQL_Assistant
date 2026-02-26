@@ -63,6 +63,7 @@ Generate an optimised SQL query.
             st.info(f"""{response['explanation']}""")
             st.toast("✅ SQL Query Generated Successfully.")
             st.session_state.generate_status = True
+            st.link_button("Link to Github Repo", url="https://github.com/AbhishekBiswas-github/GenAI_SQL_Assistant", type='primary')
 
     keys_to_clear = [
         "schema_status",
@@ -77,5 +78,4 @@ Generate an optimised SQL query.
     if st.button("Reset Everything....", type='secondary'):
         for key in keys_to_clear:
             del st.session_state[key]
-
         st.rerun()
